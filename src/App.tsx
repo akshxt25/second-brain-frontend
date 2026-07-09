@@ -1,11 +1,13 @@
-import { useState } from 'react'
+
 import './App.css'
+import { Button } from './components/ui/Button'
+import { PlusIcon } from './icons/PlusIcon'
 
 function App() {
 
   return (
     <div className="text-red-500">
-      If this text is red, Tailwind CSS is working correctly.
+      <Button startIcon={<PlusIcon size="lg" />}  variant='secondary' size="sm" text={"hi thrre"} onClick={() => {}} />
     </div>
   )
 }
