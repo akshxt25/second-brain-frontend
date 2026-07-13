@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 
 type Variants = "primary" | "secondary";
 
@@ -5,8 +6,8 @@ interface ButtonProps {
     variant : Variants
     size : "sm" | "md" | "lg";
     text : string;
-    startIcon ?: any;
-    endIcon ?: any;
+    startIcon ?: ReactElement;
+    endIcon ?: ReactElement;
     onClick : () => void;
 
 }
@@ -17,15 +18,19 @@ const variantStyles = {
 }
 
 const sizeStyles = {
-    "sm" : "py-1 px-2",
-    "md" : "py-2 px-4",
-    "lg" : "py-4 px-6"
+    "sm" : "py-1 px-2 text-xl",
+    "md" : "py-2 px-4 text-md",
+    "lg" : "py-4 px-6 text-sm"
 }
 
 const defaultStyles = "rounded-md flex"
 
 export const Button = (props: ButtonProps) => {
     return <button className={`${variantStyles[props.variant]} ${defaultStyles} ${sizeStyles[props.size]}`}>
-        {props.startIcon ? <div className="pr-2">{props.startIcon}</div> : null} {props.text} {props.endIcon}
+        {props.startIcon ? <div className="pr-2">{props.startIcon}</div> : null} 
+        <div className="pl-2 pr-2">
+            {props.text}
+        </div>
+         {props.endIcon}
         </button>
 }
