@@ -8,9 +8,9 @@ function App() {
 
   return (
     <div className="text-red-500 flex">
-      <Button startIcon={<PlusIcon size="lg" />}  endIcon={<ShareIcon size="lg"/>} variant='secondary' size="lg" text={"hi thrre"} onClick={() => {}} />
+      <Button startIcon={<PlusIcon size="lg" />}  endIcon={<ShareIcon size="lg"/>} variant='primary' size="lg" text={"hi thrre"} onClick={() => {}} />
       <Button startIcon={<PlusIcon size="md" />}  endIcon={<ShareIcon size="md"/>} variant='secondary' size="md" text={"hi thrre"} onClick={() => {}} />
-      <Button startIcon={<PlusIcon size="sm" />}  endIcon={<ShareIcon size="sm"/>} variant='secondary' size="sm" text={"hi thrre"} onClick={() => {}} />
+      <Button startIcon={<PlusIcon size="sm" />}  endIcon={<ShareIcon size="sm"/>} variant='primary' size="sm" text={"hi thrre"} onClick={() => {}} />
     </div>
   )
 }
