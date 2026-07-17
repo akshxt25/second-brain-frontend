@@ -31,20 +31,11 @@ export const Card = () => {
             allowFullScreen
           ></iframe> */}
           <blockquote className="twitter-tweet w-full">
-            <p lang="en" dir="ltr">
-              bali, I&#39;m inside you{" "}
-              <a href="https://t.co/5FmP8MMsHH">pic.twitter.com/5FmP8MMsHH</a>
-            </p>
-            &mdash; OPM (@mihirtwt){" "}
             <a href="https://x.com/mihirtwt/status/2078078529103888876?ref_src=twsrc%5Etfw">
-              July 17, 2026
+              
             </a>
-          </blockquote>{" "}
-          <script
-            async
-            src="https://platform.x.com/widgets.js"
-            charSet="utf-8"
-          ></script>
+          </blockquote>
+          
         </div>
       </div>
     </div>
