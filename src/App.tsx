@@ -1,16 +1,18 @@
 
 import './App.css'
 import { Button } from './components/ui/Button'
+import { Card } from './components/ui/Card'
 import { PlusIcon } from './icons/PlusIcon'
 import { ShareIcon } from './icons/ShareIcon'
 
 function App() {
 
   return (
-    <div className="text-red-500 flex">
-      <Button startIcon={<PlusIcon size="lg" />}  endIcon={<ShareIcon size="lg"/>} variant='primary' size="lg" text={"hi thrre"} onClick={() => {}} />
+    <div className="">
       <Button startIcon={<PlusIcon size="md" />}  endIcon={<ShareIcon size="md"/>} variant='secondary' size="md" text={"hi thrre"} onClick={() => {}} />
       <Button startIcon={<PlusIcon size="sm" />}  endIcon={<ShareIcon size="sm"/>} variant='primary' size="sm" text={"hi thrre"} onClick={() => {}} />
+
+      <Card />
     </div>
   )
 }
