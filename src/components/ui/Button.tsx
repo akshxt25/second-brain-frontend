@@ -6,7 +6,7 @@ interface ButtonProps {
 	endIcon ?: ReactElement,
 	size: "sm" | "lg" | "md",
 	text : string
-	onClick: () => void
+	onClick?: () => void
 }
 
 const variantStyles = {
