@@ -1,5 +1,5 @@
 
-import { useEffect, useState, type JSX } from "react";
+import { useEffect, useRef, useState, type JSX } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "../components/ui/Card";
 import SideNavbar from "../components/ui/SideBar";
@@ -17,11 +17,70 @@ const HomePage = () => {
   const [ytData, setYTData] = useState<any[]>([]);
   const [notionData, setNitionData] = useState<any[]>([]);
   const [dataShow, setDataShow] = useState("All");
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[] | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   let show: JSX.Element | JSX.Element[] = data1;
 
   useEffect(() => {
     fetchingData();
   }, [reloadData]);
+
+  // Debounced search
+  useEffect(() => {
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current);
+    }
+
+    if (!searchQuery.trim()) {
+      setSearchResults(null);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    searchTimerRef.current = setTimeout(() => {
+      performSearch(searchQuery.trim());
+    }, 400);
+
+    return () => {
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current);
+      }
+    };
+  }, [searchQuery]);
+
+  async function performSearch(query: string) {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/search?q=${encodeURIComponent(query)}`,
+        {
+          method: "GET",
+          headers: { authorization: token },
+          credentials: "include",
+        }
+      );
+
+      if (res.ok) {
+        const jsonData = await res.json();
+        setSearchResults(jsonData.data);
+      } else {
+        setSearchResults([]);
+      }
+    } catch (err) {
+      console.error("Search failed:", err);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }
 
   async function fetchingData() {
     try {
@@ -87,7 +146,37 @@ const HomePage = () => {
     </div>
   );
 
-  if (dataShow === "All") {
+  // No search results state
+  const NoSearchResults = () => (
+    <div className="flex flex-col items-center justify-center py-20 animate-fade-in w-full">
+      <div className="w-16 h-16 rounded-2xl bg-surface-800 border border-surface-700/50 flex items-center justify-center mb-4">
+        <svg className="w-8 h-8 text-surface-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+        </svg>
+      </div>
+      <h3 className="text-base font-semibold text-surface-300 mb-1">No results found</h3>
+      <p className="text-sm text-surface-500">Try a different search term or add more content with notes</p>
+    </div>
+  );
+
+  // Determine what to show — search results take priority
+  if (searchResults !== null) {
+    show = searchResults.length > 0 ? (
+      searchResults.map((item: any, idx: number) => (
+        <Card
+          key={item._id ?? idx}
+          contentId={item._id}
+          icon={item.contentType}
+          tag={item.tags?.[0]}
+          title={item.title}
+          link={item.link}
+          reload={() => setReloadData(!reloadData)}
+        />
+      ))
+    ) : (
+      <NoSearchResults />
+    );
+  } else if (dataShow === "All") {
     show = loading ? (
       <LoadingSkeleton />
     ) : data1.length > 0 ? (
@@ -227,6 +316,11 @@ const HomePage = () => {
     "Notion": "Documents"
   };
 
+  function clearSearch() {
+    setSearchQuery("");
+    setSearchResults(null);
+  }
+
   return (
     <div className="flex h-screen bg-surface-950">
       <SideNavbar
@@ -234,7 +328,10 @@ const HomePage = () => {
         setYTData={setYTData}
         setNitionData={setNitionData}
         data1={data1}
-        setDataShow={setDataShow}
+        setDataShow={(tab: string) => {
+          setDataShow(tab);
+          clearSearch();
+        }}
         activeTab={dataShow}
       />
       <main className="flex-1 overflow-y-auto">
@@ -242,12 +339,47 @@ const HomePage = () => {
         <div className="sticky top-0 z-10 bg-surface-950/80 backdrop-blur-xl border-b border-surface-700/30">
           <div className="flex items-center justify-between px-8 py-4">
             <div className="animate-fade-in">
-              <h1 className="text-xl font-bold text-surface-100">{tabLabels[dataShow] || "All Notes"}</h1>
+              <h1 className="text-xl font-bold text-surface-100">
+                {searchResults !== null ? "Search Results" : (tabLabels[dataShow] || "All Notes")}
+              </h1>
               <p className="text-xs text-surface-500 mt-0.5">
-                {!loading && data1.length > 0 && dataShow === "All" && `${data1.length} item${data1.length !== 1 ? 's' : ''} saved`}
+                {searchResults !== null
+                  ? `${searchResults.length} result${searchResults.length !== 1 ? 's' : ''} for "${searchQuery}"`
+                  : (!loading && data1.length > 0 && dataShow === "All" && `${data1.length} item${data1.length !== 1 ? 's' : ''} saved`)
+                }
               </p>
             </div>
-            <div className="flex gap-2.5">
+            <div className="flex items-center gap-3">
+              {/* Search bar */}
+              <div className="relative">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search your brain..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-64 h-9 pl-10 pr-9 rounded-xl bg-surface-800 border border-surface-700 text-sm text-surface-100 placeholder:text-surface-500 outline-none transition-all duration-200 focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20 focus:w-80 hover:border-surface-600"
+                />
+                {/* Loading spinner or clear button */}
+                {searchQuery && (
+                  isSearching ? (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <div className="w-4 h-4 border-2 border-surface-600 border-t-brand-400 rounded-full animate-spin"></div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={clearSearch}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded text-surface-500 hover:text-surface-300 cursor-pointer"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )
+                )}
+              </div>
               <div onClick={share}>
                 <Button
                   variant="secondary"

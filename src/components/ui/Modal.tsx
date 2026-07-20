@@ -8,6 +8,7 @@ const Modal = (props: { onClick: () => void, setModal: (value: boolean) => void,
   const modalRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
   const linkRef = useRef<HTMLInputElement>(null);
+  const notesRef = useRef<HTMLTextAreaElement>(null);
   const [tag, setTag] = useState("Productivity");
   const [category, setCategory] = useState("Youtube");
   const mapTags = ["Productivity", "Tech & Tools", "Mindset", "Learning & Skills", "Workflows", "Inspiration"] as const;
@@ -27,6 +28,7 @@ const Modal = (props: { onClick: () => void, setModal: (value: boolean) => void,
       contentType: category,
       title: titleRef.current?.value || "",
       tags: [tag],
+      notes: notesRef.current?.value || "",
     };
     try {
       const token = localStorage.getItem("token");
@@ -101,6 +103,15 @@ const Modal = (props: { onClick: () => void, setModal: (value: boolean) => void,
             <input ref={linkRef}
               type="text" required placeholder="Paste a URL..."
               className="w-full h-11 rounded-xl bg-surface-800 border border-surface-700 px-4 text-sm text-surface-100 placeholder:text-surface-500 outline-none transition-all duration-200 focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20 hover:border-surface-600" />
+          </div>
+
+          {/* Notes */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-surface-400">Notes <span className="text-surface-600 normal-case font-normal">(optional — helps search)</span></label>
+            <textarea ref={notesRef}
+              placeholder="Add your thoughts, summary, or context..."
+              rows={3}
+              className="w-full rounded-xl bg-surface-800 border border-surface-700 px-4 py-3 text-sm text-surface-100 placeholder:text-surface-500 outline-none transition-all duration-200 focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20 hover:border-surface-600 resize-none" />
           </div>
 
           {/* Tags */}
